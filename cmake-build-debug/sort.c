@@ -28,9 +28,6 @@ static int cmp(const void* ap, const void* bp)
     return 0;
 }
 
-double sec(){
-    
-}
 
 int main(int ac, char** av)
 {

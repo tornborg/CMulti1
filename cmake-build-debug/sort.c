@@ -10,7 +10,8 @@
 
 static double sec(void)
 {
-    return 0;
+    return clock();
+
 }
 
 void par_sort(
@@ -23,8 +24,8 @@ void par_sort(
 
 static int cmp(const void* ap, const void* bp)
 {
-    /* you need to modify this function to compare doubles. */
-
+    if(ap > bp) return 1;
+    else if (bp > ap) return -1;
     return 0;
 }
 
@@ -55,7 +56,7 @@ int main(int ac, char** av)
 
     end = sec();
 
-    printf("%1.2f s\n", end - start);
+    printf("%1.2f s\n", (end - start)/CLOCKS_PER_SEC);
 
     free(a);
 

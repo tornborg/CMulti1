@@ -11,7 +11,6 @@
 static double sec(void)
 {
     return clock();
-
 }
 
 void par_sort(
@@ -19,9 +18,16 @@ void par_sort(
         size_t		n,	// Number of elements in base.
         size_t		s,	// Size of each element.
         int		(*cmp)(const void*, const void*)) // Behaves like strcmp
-{   ptrhread_t thread0;
-  void *thread0(void *param);
-  pthread_create(thread0);
+{   int pivot = sizeof(base) - 1;
+    int storeIndex = pivot - 1;
+    double temp;
+    for(int i = 0; i < n; i++){
+      if(*(base + i*s) > *(base + pivot*s)){
+        temp = *(base + storeIndex*s);
+        *(base + storeIndex*s) = *(base + i*s);
+        *(base + i*s) = *(base + temp*s);
+      }
+    }
 
 }
 

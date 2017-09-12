@@ -20,7 +20,7 @@ void par_sort(
         size_t		s,	// Size of each element.
         int		(*cmp)(const void*, const void*)) // Behaves like strcmp
 {   ptrhread_t thread0;
-  void *thread0(void *param)
+  void *thread0(void *param);
   pthread_create(thread0);
 
 }

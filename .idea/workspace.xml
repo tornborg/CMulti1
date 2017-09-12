@@ -9,7 +9,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="66e546fc-f852-44ae-a5da-342015e382d4" name="Default" comment="" />
+    <list default="true" id="66e546fc-f852-44ae-a5da-342015e382d4" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,10 +25,10 @@
       <file leaf-file-name="sort.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cmake-build-debug/sort.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="53" column="9" lean-forward="false" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="9" />
+            <state relative-caret-position="330">
+              <caret line="22" column="29" lean-forward="false" selection-start-line="22" selection-start-column="29" selection-end-line="22" selection-end-column="29" />
               <folding>
-                <element signature="e#887#920#0" expanded="true" />
+                <element signature="e#967#1000#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -119,12 +121,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1505223275453</updated>
-      <workItem from="1505223278840" duration="2127000" />
+      <workItem from="1505223278840" duration="2333000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2127000" />
+    <option name="totallyTimeSpent" value="2333000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -163,10 +165,10 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/cmake-build-debug/sort.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="53" column="9" lean-forward="false" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="9" />
+        <state relative-caret-position="330">
+          <caret line="22" column="29" lean-forward="false" selection-start-line="22" selection-start-column="29" selection-end-line="22" selection-end-column="29" />
           <folding>
-            <element signature="e#887#920#0" expanded="true" />
+            <element signature="e#967#1000#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -19,7 +19,10 @@ void par_sort(
         size_t		n,	// Number of elements in base.
         size_t		s,	// Size of each element.
         int		(*cmp)(const void*, const void*)) // Behaves like strcmp
-{
+{   ptrhread_t thread0;
+  void *thread0(void *param)
+  pthread_create(thread0);
+
 }
 
 static int cmp(const void* ap, const void* bp)

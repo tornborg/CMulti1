@@ -14,21 +14,22 @@ static double sec(void)
 }
 
 void par_sort(
-        void*		base,	// Array to sort.
-        size_t		n,	// Number of elements in base.
-        size_t		s,	// Size of each element.
-        int		(*cmp)(const void*, const void*)) // Behaves like strcmp
+                  void*		base,	// Array to sort.
+                  size_t		n,	// Number of elements in base.
+                  size_t		s,	// Size of each element.
+                  int		(*cmp)(const void*, const void*)) // Behaves like strcmp
 {   int pivot = sizeof(base) - 1;
-    int storeIndex = pivot - 1;
-    double temp;
-    for(int i = 0; i < n; i++){
-      if(*(base + i*s) > *(base + pivot*s)){
-        temp = *(base + storeIndex*s);
-        *(base + storeIndex*s) = *(base + i*s);
-        *(base + i*s) = *(base + temp*s);
+      int storeIndex = pivot - 1;
+      double* unsorted = (double*) base;
+      double temp;
+      for(int i = 0; i < n; i++){
+          if(unsorted[i] > unsorted[pivot]){
+              temp = unsorted[storeIndex];
+              unsorted[storeIndex] = unsorted[i];
+              unsorted[i] = temp;
+              storeIndex++;
+          }
       }
-    }
-
 }
 
 static int cmp(const void* ap, const void* bp)

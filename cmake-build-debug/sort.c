@@ -7,6 +7,7 @@
 #include <sys/times.h>
 #include <sys/time.h>
 #include <unistd.h>
+#define PARALLEL 1;
 
 typedef struct {
     double* list;
@@ -36,25 +37,25 @@ void par_sort(
                   size_t		s,	// Size of each element.
                   int		(*cmp)(const void*, const void*),
                   int threads) // Behaves like strcmp
-{   int pivot = sizeof(base) - 1;
-    int storeIndex = pivot - 1;
+{   int pivot = 0;
+    int storeIndex = 1;
     pthread_t thread0;
     pthread_t thread1;
-    double* unsorted = (double*) base;
-    double temp;
+    double* unsorted = malloc(s*n);
+    unsorted = (double*) base;
       for(int i = 0; i < n; i++){
-          if(unsorted[i] > unsorted[pivot]){
-              temp = unsorted[storeIndex];
+          if(unsorted[i] < unsorted[pivot]){
+              double temp = unsorted[storeIndex];
               unsorted[storeIndex] = unsorted[i];
               unsorted[i] = temp;
               storeIndex++;
           }
       }
-    temp = unsorted[storeIndex];
-    unsorted[storeIndex] = unsorted[pivot];
+    double temp = unsorted[storeIndex-1];
+    unsorted[storeIndex-1] = unsorted[pivot];
     unsorted[pivot] = temp;
-    double lower[storeIndex];
-    double upper[n-storeIndex];
+    double* lower = malloc(s*storeIndex);
+    double* upper = malloc(s*(n-storeIndex));
     if(threads < 4) {
         for (int i = 0; i < n; i++) {
             if (i < storeIndex) {
@@ -85,24 +86,17 @@ void par_sort(
 
             pthread_create(&thread0, NULL, par_thread, &args1);
             pthread_create(&thread1, NULL, par_thread, &args2);
-        } else {
+            pthread_join(thread1, NULL);
+        } else if (threads < 4){
             threads++;
             pthread_create(&thread0, NULL, par_thread, &args1);
             qsort(upper, n, s, cmp);
     }
         pthread_join(thread0, NULL);
-        pthread_join(thread1, NULL);
     } else{
             qsort(unsorted, n, s, cmp);
         }
-
-
-
-
 }
-
-
-
 
 
 int main(int ac, char** av)
@@ -135,8 +129,10 @@ int main(int ac, char** av)
     end = sec();
 
     printf("%1.2f s\n", (end - start)/CLOCKS_PER_SEC);
-    for(int i = 0; i<50; i++)
-        printf("%1.2f s\n", a[i]);
+    for(int i = 1; i<n; i++){
+        printf("%1.2f \n", a[i]);
+        assert(a[i-1]-a[i]<=0);
+      }
     free(a);
 
     return 0;

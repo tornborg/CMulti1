@@ -20,7 +20,15 @@ static double sec(void)
     return clock();
 }
 
+static int cmp(const void* ap, const void* bp)
+{
+    return (*(double*)ap) - *((double*) bp);
+}
 
+void* par_thread(void* argum){
+    arguments* things = argum;
+    par_sort(things->list, things->n, things->s, cmp, things->threads);
+}
 
 void par_sort(
                   void*		base,	// Array to sort.
@@ -68,19 +76,18 @@ void par_sort(
         args1->threads = threads;
 
         args2->list = upper;
-        args2.n = n-storeIndex;
-        args2.s = s;
-        args2.cmp = cmp;
-        args2.threads = threads;
+        args2->n = n-storeIndex;
+        args2->s = s;
+        args2->threads = threads;
 
         if (threads < 1) {
             threads +=2;
 
-            pthread_create(&thread0, NULL, par_sort, &args1);
-            pthread_create(&thread1, NULL, par_sort, &args2);
+            pthread_create(&thread0, NULL, par_thread, &args1);
+            pthread_create(&thread1, NULL, par_thread, &args2);
         } else {
             threads++;
-            pthread_create(&thread0, NULL, par_sort, &args1);
+            pthread_create(&thread0, NULL, par_thread, &args1);
             qsort(upper, n, s, cmp);
     }
         pthread_join(thread0, NULL);
@@ -94,16 +101,8 @@ void par_sort(
 
 }
 
-void par_thread(void* argum){
-    arguents* things = argum;
-    things = (arguments) argum;
-    par_sort(things->list, things->n, things->s, things->cmp, things->threads);
-}
 
-static int cmp(const void* ap, const void* bp)
-{
-    return (*(double*)ap) - *((double*) bp);
-}
+
 
 
 int main(int ac, char** av)

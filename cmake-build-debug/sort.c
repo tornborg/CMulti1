@@ -13,7 +13,7 @@ typedef struct {
     double* list;
     int n;
     int s;
-    int threads;
+    volatile int threads;
 }arguments;
 
 static double sec(void)
@@ -26,76 +26,85 @@ static int cmp(const void* ap, const void* bp)
     return (*(double*)ap) - *((double*) bp);
 }
 
-void* par_thread(void* argum){
+/** void* par_thread(void* argum){
     arguments* things = argum;
     par_sort(things->list, things->n, things->s, cmp, things->threads);
-}
+} **/
 
-void par_sort(
+void* par_sort(
                   void*		base,	// Array to sort.
                   size_t		n,	// Number of elements in base.
                   size_t		s,	// Size of each element.
                   int		(*cmp)(const void*, const void*),
-                  int threads) // Behaves like strcmp
-{   int pivot = 0;
+                  volatile int threads) // Behaves like strcmp
+{
+    int pivot = 0;
     int storeIndex = 1;
     pthread_t thread0;
     pthread_t thread1;
-    double* unsorted = malloc(s*n);
-    unsorted = (double*) base;
-      for(int i = 0; i < n; i++){
-          if(unsorted[i] < unsorted[pivot]){
-              double temp = unsorted[storeIndex];
-              unsorted[storeIndex] = unsorted[i];
-              unsorted[i] = temp;
-              storeIndex++;
-          }
-      }
-    double temp = unsorted[storeIndex-1];
-    unsorted[storeIndex-1] = unsorted[pivot];
+    double *unsorted = malloc(sizeof(double) * n);
+    unsorted = (double *) base;
+
+    for (int i = 0; i < n; i++) {
+        if (unsorted[i] < unsorted[pivot]) {
+            double temp = unsorted[storeIndex];
+            unsorted[storeIndex] = unsorted[i];
+            unsorted[i] = temp;
+            storeIndex++;
+        }
+    }
+
+    double temp = unsorted[storeIndex - 1];
+    unsorted[storeIndex - 1] = unsorted[pivot];
     unsorted[pivot] = temp;
-    double* lower = malloc(s*storeIndex);
-    double* upper = malloc(s*(n-storeIndex));
-    if(threads < 4) {
+    double *lower = malloc(sizeof(double)*storeIndex);
+    int j = 0;
+    double *upper = malloc(sizeof(double)*(n - storeIndex));
+    if (threads < 4) {
+        printf("print 2: %d", threads);
+
         for (int i = 0; i < n; i++) {
             if (i < storeIndex) {
                 lower[i] = unsorted[i];
             } else {
-                upper[i] = unsorted[i];
+                upper[j] = unsorted[i];
+                j++;
             }
         }
 
-
-        arguments* args1 = malloc(sizeof(arguments));
-        arguments* args2 = malloc(sizeof(arguments));
+        arguments *args1 = malloc(sizeof(arguments));
+        arguments *args2 = malloc(sizeof(arguments));
 
         args1->list = malloc(sizeof(lower));
         args1->list = lower;
-
         args1->n = storeIndex;
         args1->s = s;
         args1->threads = threads;
 
         args2->list = upper;
-        args2->n = n-storeIndex;
+        args2->n = n - storeIndex;
         args2->s = s;
         args2->threads = threads;
-
         if (threads < 1) {
-            threads +=2;
+            printf(" Two more threads ");
+            threads = 2;
 
-            pthread_create(&thread0, NULL, par_thread, &args1);
-            pthread_create(&thread1, NULL, par_thread, &args2);
+            pthread_create(&thread0, NULL, par_sort, &args1);
+            pthread_create(&thread1, NULL, par_sort, &args2);
             pthread_join(thread1, NULL);
-        } else if (threads < 4){
-            threads++;
-            pthread_create(&thread0, NULL, par_thread, &args1);
+        } else {
+            printf(" One more Thread ");
+            threads = 4;
+            pthread_create(&thread0, NULL, par_sort, &args1);
             qsort(upper, n, s, cmp);
-    }
-        pthread_join(thread0, NULL);
-    } else{
-            qsort(unsorted, n, s, cmp);
         }
+        pthread_join(thread0, NULL);
+    } else {
+        printf("print 3: %d", threads);
+        printf(" sort this shit ");
+        qsort(unsorted, n, s, cmp);
+    }
+
 }
 
 
@@ -105,9 +114,7 @@ int main(int ac, char** av)
     int		i;
     double*		a;
     double		start, end;
-    int threadscreated = 0;
-
-
+    volatile int threadscreated = 0;
 
     if (ac > 1)
         sscanf(av[1], "%d", &n);
@@ -129,10 +136,10 @@ int main(int ac, char** av)
     end = sec();
 
     printf("%1.2f s\n", (end - start)/CLOCKS_PER_SEC);
-    for(int i = 1; i<n; i++){
+    /**for(int i = 1; i<n; i++){
         printf("%1.2f \n", a[i]);
-        assert(a[i-1]-a[i]<=0);
-      }
+      }**/
+    assert(a[i-1]-a[i]<=0);
     free(a);
 
     return 0;

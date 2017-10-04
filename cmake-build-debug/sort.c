@@ -9,11 +9,15 @@
 #include <unistd.h>
 #define PARALLEL 1;
 
+int threadscreated;
+pthread_mutex_t threadMut;
+
+void* par_sort;
+
 typedef struct {
     double* list;
     int n;
     int s;
-    volatile int threads;
 }arguments;
 
 static double sec(void)
@@ -35,8 +39,7 @@ void* par_sort(
                   void*		base,	// Array to sort.
                   size_t		n,	// Number of elements in base.
                   size_t		s,	// Size of each element.
-                  int		(*cmp)(const void*, const void*),
-                  volatile int threads) // Behaves like strcmp
+                  int		(*cmp)(const void*, const void*)) // Behaves like strcmp
 {
     int pivot = 0;
     int storeIndex = 1;
@@ -60,8 +63,7 @@ void* par_sort(
     double *lower = malloc(sizeof(double)*storeIndex);
     int j = 0;
     double *upper = malloc(sizeof(double)*(n - storeIndex));
-    if (threads < 4) {
-        printf("print 2: %d", threads);
+    if (threadscreated < 4) {
 
         for (int i = 0; i < n; i++) {
             if (i < storeIndex) {
@@ -74,38 +76,43 @@ void* par_sort(
 
         arguments *args1 = malloc(sizeof(arguments));
         arguments *args2 = malloc(sizeof(arguments));
-
+        printf("%d: size of list \n", n);
         args1->list = malloc(sizeof(lower));
         args1->list = lower;
         args1->n = storeIndex;
         args1->s = s;
-        args1->threads = threads;
 
+
+        args2->list = malloc(sizeof(upper));
         args2->list = upper;
-        args2->n = n - storeIndex;
+        args2->n = (n - storeIndex);
         args2->s = s;
-        args2->threads = threads;
-        if (threads < 1) {
-            printf(" Two more threads ");
-            threads = 2;
 
-            pthread_create(&thread0, NULL, par_sort, &args1);
-            pthread_create(&thread1, NULL, par_sort, &args2);
+        printf("%d: size of s \n", s);
+
+        if (threadscreated < 1) {
+            pthread_mutex_lock(&threadMut);
+            threadscreated = 2;
+            pthread_mutex_unlock(&threadMut);
+            pthread_create(&thread0, NULL, par_sort, (void *) args1);
+            pthread_create(&thread1, NULL, par_sort, (void *) args2);
             pthread_join(thread1, NULL);
-        } else {
-            printf(" One more Thread ");
-            threads = 4;
-            pthread_create(&thread0, NULL, par_sort, &args1);
+        } else if (threadscreated < 4) {
+            pthread_mutex_lock(&threadMut);
+            threadscreated += 1;
+            pthread_mutex_unlock(&threadMut);
+            pthread_create(&thread, NULL, qsort, (void *) args1);
             qsort(upper, n, s, cmp);
+
+            pthread_join(thread, NULL);
         }
-        pthread_join(thread0, NULL);
     } else {
-        printf("print 3: %d", threads);
-        printf(" sort this shit ");
-        qsort(unsorted, n, s, cmp);
-    }
+            qsort(unsorted, n, s, cmp);
+        }
 
 }
+
+
 
 
 int main(int ac, char** av)
@@ -114,8 +121,6 @@ int main(int ac, char** av)
     int		i;
     double*		a;
     double		start, end;
-    volatile int threadscreated = 0;
-
     if (ac > 1)
         sscanf(av[1], "%d", &n);
 
@@ -128,7 +133,7 @@ int main(int ac, char** av)
     start = sec();
 
 #ifdef PARALLEL
-    par_sort(a, n, sizeof a[0], cmp, threadscreated);
+    par_sort(a, n, sizeof a[0], cmp);
 #else
     qsort(a, n, sizeof a[0], cmp);
 #endif
@@ -136,10 +141,11 @@ int main(int ac, char** av)
     end = sec();
 
     printf("%1.2f s\n", (end - start)/CLOCKS_PER_SEC);
-    /**for(int i = 1; i<n; i++){
-        printf("%1.2f \n", a[i]);
-      }**/
-    assert(a[i-1]-a[i]<=0);
+    for(int i = 1; i<n; i++){
+        //printf("%1.2f \n", a[i]);
+        assert(a[i-1]-a[i]>=0);
+
+    }
     free(a);
 
     return 0;
